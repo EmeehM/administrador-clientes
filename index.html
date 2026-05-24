@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SegurTrack - Control de Vencimientos de Pólizas</title>
+  <!-- Google Fonts para Tipografía Premium -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Carga de Hojas de Estilo -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Dexie.js para IndexedDB y SheetJS para Excel parsing -->
+  <script src="https://cdn.jsdelivr.net/npm/dexie@3.2.4/dist/dexie.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="dark-theme">
+  <!-- Contenedor Principal de la App -->
+  <div class="app-container">
+    
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 12 2 2 4-4"/>
+          </svg>
+        </div>
+        <span class="brand-title">SegurTrack</span>
+      </div>
+      
+      <nav class="sidebar-menu">
+        <a href="#dashboard" class="menu-item active" data-target="dashboard-section">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+          </span>
+          <span class="menu-text">Tablero Principal</span>
+        </a>
+        <a href="#policies" class="menu-item" data-target="policies-section">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </span>
+          <span class="menu-text">Clientes y Pólizas</span>
+        </a>
+        <a href="#import" class="menu-item" data-target="import-section">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </span>
+          <span class="menu-text">Importar Excel</span>
+        </a>
+        <a href="#settings" class="menu-item" data-target="settings-section">
+          <span class="menu-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </span>
+          <span class="menu-text">Configuración</span>
+        </a>
+      </nav>
+      
+      <div class="sidebar-footer">
+        <span class="version-badge">v1.1.0 Offline</span>
+      </div>
+    </aside>
+
+    <!-- ÁREA DE CONTENIDO (MAIN CONTENT) -->
+    <div class="main-wrapper">
+      
+      <!-- CABECERA SUPERIOR (HEADER) -->
+      <header class="header">
+        <div class="header-left">
+          <button class="mobile-toggle" id="mobile-toggle" aria-label="Abrir Menú">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <h1 class="page-title" id="page-title">Tablero Principal</h1>
+        </div>
+        
+        <div class="header-right">
+          <!-- Buscador Unificado -->
+          <div class="search-container" id="header-search-container">
+            <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="global-search" placeholder="Buscar asegurado, póliza, ramo...">
+            <button class="search-clear-btn" id="search-clear-btn" aria-label="Limpiar búsqueda">&times;</button>
+          </div>
+
+          <!-- Selector de Tema Claro/Oscuro -->
+          <button class="theme-toggle" id="theme-toggle" title="Alternar Tema">
+            <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          
+          <!-- Campanita de Notificaciones -->
+          <div class="notification-bell-container">
+            <button class="bell-btn" id="bell-btn" aria-label="Notificaciones">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span class="bell-badge" id="bell-badge">0</span>
+            </button>
+            
+            <!-- PANEL DE NOTIFICACIONES FLOTANTE -->
+            <div class="notifications-panel" id="notifications-panel">
+              <div class="notifications-header">
+                <h3>Vencimientos Críticos</h3>
+                <span class="count-desc" id="notifications-count-desc">0 alertas activas</span>
+              </div>
+              <div class="notifications-list" id="notifications-list">
+                <!-- Se rellena dinámicamente -->
+                <div class="empty-notifications">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+                  <p>¡Todo al día! No hay pólizas próximas a vencer o vencidas.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- CONTENIDOS DE CADA SECCIÓN -->
+      <main class="content-body">
+        
+        <!-- SECCIÓN 1: DASHBOARD -->
+        <section id="dashboard-section" class="app-section active">
+          <!-- Grilla de Métricas -->
+          <div class="metrics-grid">
+            <!-- Card 1: Total Clientes -->
+            <div class="metric-card card-total">
+              <div class="card-glow"></div>
+              <div class="metric-content">
+                <div class="metric-label">Asegurados Totales</div>
+                <div class="metric-value" id="stat-total-clients">0</div>
+                <div class="metric-sub">Pólizas cargadas en sistema</div>
+              </div>
+              <div class="metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+            </div>
+
+            <!-- Card 2: Vigentes (Verde) -->
+            <div class="metric-card card-green">
+              <div class="card-glow"></div>
+              <div class="metric-content">
+                <div class="metric-label">Pólizas Vigentes</div>
+                <div class="metric-value" id="stat-green">0</div>
+                <div class="metric-sub">> 15 días de cobertura restante</div>
+              </div>
+              <div class="metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+              </div>
+            </div>
+
+            <!-- Card 3: Próximas a Vencer (Amarillo) -->
+            <div class="metric-card card-yellow">
+              <div class="card-glow"></div>
+              <div class="metric-content">
+                <div class="metric-label">Próximas a Vencer</div>
+                <div class="metric-value" id="stat-yellow">0</div>
+                <div class="metric-sub">De 1 a 15 días para expirar</div>
+              </div>
+              <div class="metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              </div>
+            </div>
+
+            <!-- Card 4: Vencidas (Rojo) -->
+            <div class="metric-card card-red">
+              <div class="card-glow"></div>
+              <div class="metric-content">
+                <div class="metric-label">Pólizas Vencidas</div>
+                <div class="metric-value" id="stat-red">0</div>
+                <div class="metric-sub">Vencidas o vencen hoy</div>
+              </div>
+              <div class="metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gráfico de Resumen Rápido / Información del Sistema -->
+          <div class="dashboard-details">
+            <div class="details-panel info-panel animate-slide-up">
+              <div class="panel-header">
+                <h2>Resumen de Operación del Semáforo</h2>
+              </div>
+              <div class="panel-body">
+                <div class="semaphore-legend">
+                  <div class="legend-item">
+                    <span class="legend-led led-green"></span>
+                    <div class="legend-text">
+                      <strong>Vigente (Verde)</strong>
+                      <p>La cobertura está plenamente asegurada. Más de 15 días disponibles.</p>
+                    </div>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-led led-yellow"></span>
+                    <div class="legend-text">
+                      <strong>Próximo a Vencer (Amarillo)</strong>
+                      <p>Período crítico. Se recomienda notificar al asegurado para coordinar la renovación.</p>
+                    </div>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-led led-red"></span>
+                    <div class="legend-text">
+                      <strong>Vencido (Rojo)</strong>
+                      <p>¡Alerta! Sin cobertura vigente. Pólizas expiradas o que finalizan en la fecha actual.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="details-panel fast-actions-panel animate-slide-up">
+              <div class="panel-header">
+                <h2>Accesos Rápidos</h2>
+              </div>
+              <div class="panel-body grid-buttons">
+                <button class="fast-btn btn-import" onclick="navigateToSection('import-section')">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  <span>Importar Excel</span>
+                </button>
+                <button class="fast-btn btn-new" id="dashboard-btn-new-policy">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  <span>Nueva Póliza</span>
+                </button>
+                <button class="fast-btn btn-backup" onclick="navigateToSection('settings-section')">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L18 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L6 16"/></svg>
+                  <span>Respaldos</span>
+                </button>
+                <button class="fast-btn btn-view-all" onclick="navigateToSection('policies-section')">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span>Ver todas las pólizas</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 2: CLIENTES Y PÓLIZAS -->
+        <section id="policies-section" class="app-section">
+          <!-- Filtros e Interacciones de Pólizas -->
+          <div class="filters-card animate-slide-up">
+            <div class="filter-group">
+              <label>Filtrar por Estado:</label>
+              <div class="status-badges-filters">
+                <button class="filter-status-btn active" data-status="all">Todos</button>
+                <button class="filter-status-btn" data-status="green">
+                  <span class="led led-green"></span> Vigentes
+                </button>
+                <button class="filter-status-btn" data-status="yellow">
+                  <span class="led led-yellow"></span> Próximos
+                </button>
+                <button class="filter-status-btn" data-status="red">
+                  <span class="led led-red"></span> Vencidos
+                </button>
+              </div>
+            </div>
+            
+            <div class="filter-group">
+              <label for="filter-ramo">Ramo de Seguros:</label>
+              <select id="filter-ramo">
+                <option value="all">Todos los Ramos</option>
+                <!-- Se llena dinámicamente -->
+              </select>
+            </div>
+            
+            <div class="filter-actions">
+              <button class="btn btn-primary" id="btn-add-policy-manual">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Nueva Póliza
+              </button>
+            </div>
+          </div>
+
+          <!-- Contenedor de la Tabla Principal -->
+          <div class="table-container-card animate-slide-up">
+            <div class="table-header-info">
+              <div class="results-counter" id="results-counter">Mostrando 0 registros</div>
+              <div class="sort-tip">Tip: Haz clic en el encabezado de las columnas para ordenar.</div>
+            </div>
+            <div class="table-wrapper">
+              <table class="data-table" id="policies-table">
+                <thead>
+                  <tr>
+                    <th data-sort="asegurado" class="sortable">Asegurado <span class="sort-icon">↕</span></th>
+                    <th data-sort="poliza" class="sortable">N° Póliza <span class="sort-icon">↕</span></th>
+                    <th data-sort="ramo" class="sortable">Ramo <span class="sort-icon">↕</span></th>
+                    <th data-sort="vto" class="sortable">Vencimiento <span class="sort-icon">↕</span></th>
+                    <th data-sort="dias" class="sortable">Días Restantes <span class="sort-icon">↕</span></th>
+                    <th data-sort="saldo" class="sortable">Saldo ($) <span class="sort-icon">↕</span></th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody id="policies-table-body">
+                  <!-- Se rellena dinámicamente -->
+                  <tr>
+                    <td colspan="8" class="empty-table-message">
+                      <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg>
+                        <p>No se encontraron registros de pólizas cargados.</p>
+                        <span>Importa un archivo Excel o crea una póliza manualmente para comenzar.</span>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 3: IMPORTAR EXCEL -->
+        <section id="import-section" class="app-section">
+          <div class="import-card animate-slide-up">
+            <div class="import-instructions">
+              <h2>Mapeo Inteligente e Importación de Planilla</h2>
+              <p>El motor de importación lee planillas de Excel (`.xlsx`, `.xls`) o archivos de texto delimitados (`.csv`) mapeando las siguientes columnas:</p>
+              <div class="columns-badge-row">
+                <div class="col-badge required"><span>ASEGURADO</span> <small>(Obligatorio)</small></div>
+                <div class="col-badge required"><span>POLIZA</span> <small>(Clave Única)</small></div>
+                <div class="col-badge required"><span>RAMO</span> <small>(Obligatorio)</small></div>
+                <div class="col-badge required"><span>VTO.</span> <small>(Fecha de Vencimiento)</small></div>
+                <div class="col-badge optional"><span>SALDO</span> <small>(Saldo Pendiente)</small></div>
+                <div class="col-badge optional"><span>EMISION</span> <small>(Fecha Emisión)</small></div>
+                <div class="col-badge optional"><span>F. NAC</span> <small>(Fecha Nacimiento)</small></div>
+              </div>
+              <div class="alert-info">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <span><strong>Protección Antiduplicados activa:</strong> Si se sube una póliza que ya existe en la base de datos local, la aplicación la actualizará automáticamente con los datos del Excel más reciente, asegurando que no existan duplicados.</span>
+              </div>
+            </div>
+
+            <!-- Zona Drag & Drop -->
+            <div class="drag-drop-zone" id="drag-drop-zone">
+              <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" style="display:none;">
+              <div class="drag-drop-content">
+                <div class="upload-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                </div>
+                <h3>Arrastra y suelta tu planilla de seguros aquí</h3>
+                <p>O si lo prefieres, haz clic para explorar tus archivos locales</p>
+                <span class="file-format-info">Formatos admitidos: .xlsx, .xls, .csv</span>
+              </div>
+            </div>
+
+            <!-- Panel de Progreso e Importación -->
+            <div class="import-progress-panel" id="import-progress-panel" style="display: none;">
+              <div class="progress-info">
+                <span class="progress-title" id="progress-status-text">Procesando archivo...</span>
+                <span class="progress-percentage" id="progress-percent">0%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+              </div>
+            </div>
+
+            <!-- Resumen del Resultado de la Importación -->
+            <div class="import-result-card" id="import-result-card" style="display: none;">
+              <div class="result-header">
+                <div class="success-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <h3>¡Importación Procesada con Éxito!</h3>
+              </div>
+              <div class="result-stats">
+                <div class="result-stat-item">
+                  <span class="stat-number" id="import-added-count">0</span>
+                  <span class="stat-label">Pólizas Nuevas Registradas</span>
+                </div>
+                <div class="result-stat-item">
+                  <span class="stat-number" id="import-updated-count">0</span>
+                  <span class="stat-label">Pólizas Actualizadas (Duplicados)</span>
+                </div>
+                <div class="result-stat-item">
+                  <span class="stat-number" id="import-total-processed">0</span>
+                  <span class="stat-label">Filas Totales Leídas</span>
+                </div>
+              </div>
+              <button class="btn btn-secondary" onclick="navigateToSection('policies-section')">Ir a Clientes y Pólizas</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECCIÓN 4: AJUSTES / CONFIGURACIÓN -->
+        <section id="settings-section" class="app-section">
+          <div class="settings-grid animate-slide-up">
+            
+            <!-- Panel de Copias de Seguridad (Backup) -->
+            <div class="settings-card">
+              <div class="card-header">
+                <h2>Copia de Seguridad y Respaldos</h2>
+              </div>
+              <div class="card-body">
+                <p>Toda la información de la aplicación se almacena a nivel local. Para evitar pérdidas accidentales, puedes crear copias de seguridad portables.</p>
+                
+                <div class="settings-action-row">
+                  <button class="btn btn-primary" id="btn-export-db">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    Exportar Base de Datos (.JSON)
+                  </button>
+                  <p class="action-desc">Guarda toda tu información, pólizas y clientes en un archivo JSON local en tu equipo.</p>
+                </div>
+
+                <hr class="settings-divider">
+
+                <div class="settings-action-row">
+                  <input type="file" id="import-db-input" accept=".json" style="display: none;">
+                  <button class="btn btn-secondary" id="btn-trigger-import-db">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Restaurar Base de Datos
+                  </button>
+                  <p class="action-desc">Carga una copia de seguridad JSON previamente exportada para reestablecer la información.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Panel de Generación de Pruebas y Limpieza -->
+            <div class="settings-card">
+              <div class="card-header">
+                <h2>Herramientas de Datos y Sistema</h2>
+              </div>
+              <div class="card-body">
+                <p>Gestione de forma rápida los datos del sistema, ideal para pruebas de validación iniciales o reseteos parciales.</p>
+
+                <!-- Descargar Planilla de Prueba -->
+                <div class="settings-action-row">
+                  <button class="btn btn-success" id="btn-generate-demo-xlsx">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    Descargar Planilla Excel de Prueba
+                  </button>
+                  <p class="action-desc">Obtiene un archivo de Excel (`.xlsx`) preconfigurado con pólizas vigentes, vencidas y próximas a vencer para comprobar el funcionamiento inmediato del semáforo.</p>
+                </div>
+
+                <hr class="settings-divider">
+
+                <!-- Vaciar Base de Datos -->
+                <div class="settings-action-row">
+                  <button class="btn btn-danger" id="btn-reset-db">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;margin-right:8px;"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    Eliminar Todos los Datos
+                  </button>
+                  <p class="action-desc text-danger">Borra de forma permanente todas las pólizas locales guardadas en IndexedDB. Esta acción es irreversible.</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- MODAL: FORMULARIO CRUD MANUAL DE PÓLIZAS -->
+  <div class="modal-backdrop" id="policy-modal">
+    <div class="modal-card animate-slide-up">
+      <div class="modal-header">
+        <h2 id="modal-title">Agregar Nueva Póliza</h2>
+        <button class="close-modal-btn" id="btn-close-modal" aria-label="Cerrar modal">&times;</button>
+      </div>
+      <form id="policy-form" class="modal-form">
+        <!-- Campo oculto para edición -->
+        <input type="hidden" id="form-edit-original-poliza">
+        
+        <div class="form-row">
+          <div class="form-field">
+            <label for="form-asegurado">Nombre del Asegurado *</label>
+            <input type="text" id="form-asegurado" required placeholder="Ej: PEREZ JUAN">
+          </div>
+          <div class="form-field">
+            <label for="form-poliza">Número de Póliza *</label>
+            <input type="text" id="form-poliza" required placeholder="Ej: A-988383">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="form-ramo">Ramo *</label>
+            <input type="text" id="form-ramo" required placeholder="Ej: AUTOMOTORES">
+          </div>
+          <div class="form-field">
+            <label for="form-vto">Fecha de Vencimiento *</label>
+            <input type="date" id="form-vto" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label for="form-saldo">Saldo Pendiente ($)</label>
+            <input type="number" id="form-saldo" step="0.01" placeholder="Ej: 0.00">
+          </div>
+          <div class="form-field">
+            <label for="form-emision">Fecha de Emisión</label>
+            <input type="date" id="form-emision">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field full-width">
+            <label for="form-f-nac">Fecha de Nacimiento del Asegurado</label>
+            <input type="date" id="form-f-nac">
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-modal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-submit-modal">Guardar Póliza</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST / NOTIFICACIONES IN-APP -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- CARGAR EL CONTROLADOR PRINCIPAL JS -->
+  <script src="app.js"></script>
+</body>
+</html>

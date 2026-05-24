@@ -1,0 +1,41 @@
+# Dependencias de Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Salidas de Compilación y Distribución de Electron
+dist/
+build/
+*.exe
+*.dmg
+*.deb
+*.rpm
+
+# Configuración del Entorno (Variables locales e información confidencial)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Archivos del Sistema Operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos de Pruebas e Importaciones de Demostración Locales
+*.xlsx
+*.xls
+*.csv
+backup_segurtrack_*.json
+
+# Caché e Historial de Editores (IDE)
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
