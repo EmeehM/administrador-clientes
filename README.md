@@ -81,7 +81,7 @@ Ideal para distribuir al usuario final como un programa instalable de escritorio
 
 1.  Abre tu consola de comandos en esta carpeta del proyecto:
     ```bash
-    cd "d:\0-Python Projects\administrador-clientes"
+    cd "/administrador-clientes"
     ```
 2.  Instala Electron y las herramientas de empaquetado:
     ```bash
