@@ -172,6 +172,19 @@
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
               </div>
             </div>
+
+            <!-- Card 5: Pausadas (Púrpura) -->
+            <div class="metric-card card-paused">
+              <div class="card-glow"></div>
+              <div class="metric-content">
+                <div class="metric-label">Pólizas en Pausa</div>
+                <div class="metric-value" id="stat-paused">0</div>
+                <div class="metric-sub">Pausadas manualmente</div>
+              </div>
+              <div class="metric-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>
+              </div>
+            </div>
           </div>
 
           <!-- Gráfico de Resumen Rápido / Información del Sistema -->
@@ -201,6 +214,13 @@
                     <div class="legend-text">
                       <strong>Vencido (Rojo)</strong>
                       <p>¡Alerta! Sin cobertura vigente. Pólizas expiradas o que finalizan en la fecha actual.</p>
+                    </div>
+                  </div>
+                  <div class="legend-item">
+                    <span class="legend-led led-paused"></span>
+                    <div class="legend-text">
+                      <strong>Póliza en Pausa (Púrpura)</strong>
+                      <p>Pausada manualmente. No genera alertas de vencimiento ni se calcula su semáforo.</p>
                     </div>
                   </div>
                 </div>
@@ -249,6 +269,9 @@
                 </button>
                 <button class="filter-status-btn" data-status="red">
                   <span class="led led-red"></span> Vencidos
+                </button>
+                <button class="filter-status-btn" data-status="paused">
+                  <span class="led led-paused"></span> Pausadas
                 </button>
               </div>
             </div>
@@ -493,9 +516,15 @@
         </div>
 
         <div class="form-row">
-          <div class="form-field full-width">
+          <div class="form-field">
             <label for="form-f-nac">Fecha de Nacimiento del Asegurado</label>
             <input type="date" id="form-f-nac">
+          </div>
+          <div class="form-field checkbox-field" style="justify-content: center; align-items: flex-start; gap: 8px;">
+            <label for="form-paused" style="display: flex; align-items: center; gap: 10px; cursor: pointer; user-select: none; width: 100%; margin-top: 24px;">
+              <input type="checkbox" id="form-paused" style="width: 20px; height: 20px; accent-color: var(--status-paused); cursor: pointer;">
+              <span style="font-size: 13.5px; font-weight: 600; text-transform: none; color: var(--text-primary);">Pausar Póliza / Semáforo</span>
+            </label>
           </div>
         </div>
 

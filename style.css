@@ -12,6 +12,7 @@
   --color-green-hue: 142;
   --color-yellow-hue: 42;
   --color-red-hue: 350;
+  --color-paused-hue: 270;
 
   --status-green: hsl(var(--color-green-hue), 76%, 45%);
   --status-green-glow: hsla(var(--color-green-hue), 76%, 45%, 0.25);
@@ -24,6 +25,10 @@
   --status-red: hsl(var(--color-red-hue), 84%, 52%);
   --status-red-glow: hsla(var(--color-red-hue), 84%, 52%, 0.25);
   --status-red-bg: hsla(var(--color-red-hue), 84%, 52%, 0.12);
+
+  --status-paused: hsl(var(--color-paused-hue), 76%, 60%);
+  --status-paused-glow: hsla(var(--color-paused-hue), 76%, 60%, 0.25);
+  --status-paused-bg: hsla(var(--color-paused-hue), 76%, 60%, 0.12);
 
   /* Transición Global */
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -679,6 +684,10 @@ body.light-theme .moon-icon { display: block; }
 .card-red .metric-value { color: var(--status-red); }
 .card-red .metric-icon { background-color: var(--status-red-bg); color: var(--status-red); }
 
+.card-paused { border-left: 4px solid var(--status-paused); }
+.card-paused .metric-value { color: var(--status-paused); }
+.card-paused .metric-icon { background-color: var(--status-paused-bg); color: var(--status-paused); }
+
 /* DASHBOARD DETAILS */
 .dashboard-details {
   display: grid;
@@ -742,6 +751,7 @@ body.light-theme .moon-icon { display: block; }
 .led-green { background-color: var(--status-green); box-shadow: 0 0 8px var(--status-green-glow); }
 .led-yellow { background-color: var(--status-yellow); box-shadow: 0 0 8px var(--status-yellow-glow); }
 .led-red { background-color: var(--status-red); box-shadow: 0 0 8px var(--status-red-glow); }
+.led-paused { background-color: var(--status-paused); box-shadow: 0 0 8px var(--status-paused-glow); }
 
 .legend-text strong {
   font-size: 14px;
@@ -1037,6 +1047,7 @@ body.light-theme .moon-icon { display: block; }
 .data-table tbody tr.row-red { background-color: var(--status-red-bg); }
 .data-table tbody tr.row-yellow { background-color: var(--status-yellow-bg); }
 .data-table tbody tr.row-green { background-color: transparent; }
+.data-table tbody tr.row-paused { background-color: var(--status-paused-bg); }
 
 /* Resaltado dinámico para cuando el usuario hace clic desde la campana */
 .data-table tbody tr.row-highlight {
@@ -1067,6 +1078,7 @@ body.light-theme .moon-icon { display: block; }
 .state-green { color: var(--status-green); }
 .state-yellow { color: var(--status-yellow); }
 .state-red { color: var(--status-red); }
+.state-paused { color: var(--status-paused); }
 
 /* Acciones en Tabla */
 .action-buttons {

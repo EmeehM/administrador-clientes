@@ -220,7 +220,9 @@ async function refreshData() {
       const dias = getDaysDifference(pol.vto);
       let status = 'green'; // Por defecto verde
       
-      if (dias <= 0) {
+      if (pol.paused) {
+        status = 'paused';
+      } else if (dias <= 0) {
         status = 'red';
       } else if (dias >= 1 && dias <= 15) {
         status = 'yellow';
@@ -306,11 +308,13 @@ function renderMetrics() {
   const green = allPolicies.filter(p => p.status === 'green').length;
   const yellow = allPolicies.filter(p => p.status === 'yellow').length;
   const red = allPolicies.filter(p => p.status === 'red').length;
+  const paused = allPolicies.filter(p => p.status === 'paused').length;
 
   document.getElementById('stat-total-clients').textContent = total;
   document.getElementById('stat-green').textContent = green;
   document.getElementById('stat-yellow').textContent = yellow;
   document.getElementById('stat-red').textContent = red;
+  document.getElementById('stat-paused').textContent = paused;
 }
 
 // Tabla de Datos e Interacción
@@ -400,6 +404,10 @@ function renderTable() {
       statusClass = 'row-yellow';
       statusLabel = 'Próximo';
       daysLabel = `Vence en ${pol.diasRestantes} días`;
+    } else if (pol.status === 'paused') {
+      statusClass = 'row-paused';
+      statusLabel = 'En Pausa';
+      daysLabel = 'Pausado';
     }
 
     const formattedSaldo = new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS' }).format(pol.saldo || 0);
@@ -649,6 +657,13 @@ async function processExcelFile(file) {
         const dateEmision = parseExcelDate(mappedRow.emision);
         const strEmision = dateEmision ? formatDateToISO(dateEmision) : '';
 
+        const parsedPaused = mappedRow.paused === true || 
+                             String(mappedRow.paused || '').toLowerCase().includes('si') || 
+                             String(mappedRow.paused || '').toLowerCase().includes('yes') || 
+                             String(mappedRow.paused || '').toLowerCase().includes('paus') || 
+                             String(mappedRow.estado || '').toLowerCase().includes('paus') || 
+                             false;
+
         const policyObj = {
           poliza: cleanPoliza,
           asegurado: cleanAsegurado,
@@ -656,7 +671,8 @@ async function processExcelFile(file) {
           vto: strVto,
           saldo: parsedSaldo,
           emision: strEmision,
-          fNac: strFNac
+          fNac: strFNac,
+          paused: parsedPaused
         };
 
         // Comprobar si existe la póliza para marcar como nuevo o actualizado (prevención duplicados)
@@ -738,6 +754,8 @@ function mapHeaders(row) {
       mapped.emision = row[key];
     } else if (normKey === 'FNAC' || normKey === 'FECHANACIMIENTO' || normKey === 'NACIMIENTO') {
       mapped.fnac = row[key];
+    } else if (normKey === 'PAUSA' || normKey === 'PAUSADA' || normKey === 'ESTADO' || normKey === 'PAUSADO') {
+      mapped.paused = row[key];
     }
   });
 
@@ -838,10 +856,12 @@ function openPolicyModal(policyToEdit = null) {
     document.getElementById('form-saldo').value = policyToEdit.saldo || '';
     document.getElementById('form-emision').value = policyToEdit.emision || '';
     document.getElementById('form-f-nac').value = policyToEdit.fNac || '';
+    document.getElementById('form-paused').checked = !!policyToEdit.paused;
   } else {
     modalTitle.textContent = "Agregar Nueva Póliza";
     document.getElementById('form-edit-original-poliza').value = '';
     document.getElementById('form-poliza').disabled = false;
+    document.getElementById('form-paused').checked = false;
   }
 
   modal.classList.add('active');
@@ -862,6 +882,7 @@ async function handleSavePolicyManual(e) {
   const saldoVal = parseFloat(document.getElementById('form-saldo').value) || 0;
   const emisionVal = document.getElementById('form-emision').value;
   const fNacVal = document.getElementById('form-f-nac').value;
+  const pausedVal = document.getElementById('form-paused').checked;
 
   if (!newPolizaId || !aseguradoVal || !ramoVal || !vtoVal) {
     showToast("Por favor complete los campos obligatorios (*)", "error");
@@ -876,7 +897,8 @@ async function handleSavePolicyManual(e) {
       vto: vtoVal,
       saldo: saldoVal,
       emision: emisionVal,
-      fNac: fNacVal
+      fNac: fNacVal,
+      paused: pausedVal
     };
 
     // Si es edición y la póliza ID es distinta (en teoría disabled), borrar vieja
@@ -988,7 +1010,8 @@ async function handleImportDatabase(e) {
             vto: pol.vto || '',
             saldo: parseFloat(pol.saldo) || 0,
             emision: pol.emision || '',
-            fNac: pol.fNac || ''
+            fNac: pol.fNac || '',
+            paused: !!pol.paused
           });
         }
       }
